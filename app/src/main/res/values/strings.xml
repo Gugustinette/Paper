@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Paper</string>
+    <string name="title_home">Home</string>
+    <string name="title_search">Search</string>
+    <string name="title_settings">Settings</string>
+    <string name="default_title">Movie title loading</string>
+    <string name="default_grade">-- %</string>
+</resources>
