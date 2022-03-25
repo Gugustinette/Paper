@@ -22,7 +22,7 @@
         <activity
             android:name=".ui.movie_page.MoviePageActivity"
             android:exported="true"
-            android:label="@string/app_name">
+            android:label="@string/movie_page_name">
         </activity>
     </application>
 

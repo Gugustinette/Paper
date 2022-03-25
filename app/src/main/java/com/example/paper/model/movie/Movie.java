@@ -11,6 +11,7 @@ public class Movie implements Parcelable {
     private Boolean adult;
     private String overview;
     private String grade;
+    private String duration;
 
     public Movie(String id, String name, String releaseData, String posterPath, Boolean adult, String overview, String grade) {
         this.id = id;
@@ -80,9 +81,17 @@ public class Movie implements Parcelable {
         this.grade = grade;
     }
 
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
     @Override
     public String toString() {
-        return "Film{" +
+        return "Movie{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", releaseData='" + releaseData + '\'' +
@@ -90,6 +99,7 @@ public class Movie implements Parcelable {
                 ", adult=" + adult +
                 ", overview='" + overview + '\'' +
                 ", grade='" + grade + '\'' +
+                ", duration='" + duration + '\'' +
                 '}';
     }
 

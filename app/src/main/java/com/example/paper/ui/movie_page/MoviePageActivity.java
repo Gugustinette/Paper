@@ -1,24 +1,19 @@
 package com.example.paper.ui.movie_page;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 import com.example.paper.R;
 import com.example.paper.model.movie.Movie;
 import com.example.paper.model.movie.StremingProvider;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -30,15 +25,12 @@ import java.util.ArrayList;
 public class MoviePageActivity extends AppCompatActivity {
     ImageView v_poster;
     TextView v_title;
-
     TextView v_illustrations;
-
-    TextView v_overwiew;
-
-    TextView v_genres;
-
     TextView v_duration;
-
+    TextView v_overwiew;
+    TextView v_release_date;
+    TextView v_genres;
+    TextView v_adult;
     TextView v_critics;
 
 
@@ -53,6 +45,10 @@ public class MoviePageActivity extends AppCompatActivity {
         // Init view components
         v_poster = findViewById(R.id.poster_image);
         v_title = findViewById(R.id.movie_title);
+        v_duration = findViewById(R.id.duration);
+        v_overwiew = findViewById(R.id.overview);
+        v_adult = findViewById(R.id.adult);
+
         // Try catch to handle when the pass is null
         Movie movie = (Movie) getIntent().getExtras().get("movie");
         try {
@@ -73,9 +69,17 @@ public class MoviePageActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // Set simple datas
         v_title.setText(movie.getName());
+        v_overwiew.setText(movie.getOverview());
+        if (movie.getAdult()) {
+            v_adult.setText("Atttention : Ce film est réservé à un public avertit");
+        }else{
+            v_adult.setText("Film tout publique");
+        }
 
         this.SetMovieProviders(this.getBaseContext(), findViewById(R.id.list_providers), movie.getId());
+        this.SetMovieDetails(this.getBaseContext(), this, movie.getId());
     }
 
     public void SetMovieProviders(Context context, TextView providers, String movie_id) {
@@ -140,6 +144,33 @@ public class MoviePageActivity extends AppCompatActivity {
                             } catch (Exception exception) {
                                 //exception.printStackTrace();
                             }
+
+
+                        }
+                    }
+                });
+    }
+
+    public void SetMovieDetails(Context context, MoviePageActivity activity, String movie_id) {
+        String API_KEY = "8b466a6b5e68647ae3e550470e2bb324"; // getResources().getString(R.string.api_key);
+
+        v_duration = activity.findViewById(R.id.duration);
+        v_genres = activity.findViewById(R.id.genres);
+        v_release_date = activity.findViewById(R.id.releasedate);
+
+        // Get the data from the server with Ion
+        Ion.with(context)
+                .load("https://api.themoviedb.org/3/movie/"+ movie_id +"/" + API_KEY)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            Log.e("MainActivity", "Error: " + e.getMessage());
+                        } else {
+                            Log.i("MainActivity", "Success: " + result.toString());
+                            //JsonObject results = result.getAsJsonObject("results");
+                            Log.d("results2", result.toString());
 
 
                         }
