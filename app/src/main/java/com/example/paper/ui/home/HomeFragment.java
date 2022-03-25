@@ -14,6 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.paper.R;
 import com.example.paper.databinding.FragmentHomeBinding;
@@ -34,7 +36,7 @@ public class HomeFragment extends Fragment {
 
     private ArrayList<Movie> movies;
     private MovieCardListAdapter moviesAdapter;
-    ListView moviesView;
+    RecyclerView moviesView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -43,6 +45,10 @@ public class HomeFragment extends Fragment {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        // Select components
+        // Attach the adapter to a ListView
+        moviesView = (RecyclerView) binding.MovieCardList;
 
         // Popular movie
         //
@@ -53,10 +59,13 @@ public class HomeFragment extends Fragment {
         // Data setup
         movies = new ArrayList<>();
 
+        moviesView.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(this.getContext());
+        llm.setOrientation(LinearLayoutManager.HORIZONTAL);
+        moviesView.setLayoutManager(llm);
+
         // Create the adapter to convert the array to views
-        moviesAdapter = new MovieCardListAdapter(this.getContext(), movies);
-        // Attach the adapter to a ListView
-        moviesView = binding.MovieCardList;
+        moviesAdapter = new MovieCardListAdapter(movies);
         moviesView.setAdapter(moviesAdapter);
 
         // Launch API Call
@@ -131,11 +140,13 @@ public class HomeFragment extends Fragment {
                             // Print the films
                             Log.i("MainActivity - Popular Movie", temp_movie.toString());
 
-                            return temp_movie;
+                            // return temp_movie;
                         }
                     }
                 });
+        return null;
         }
+
 
     @Override
     public void onDestroyView() {
