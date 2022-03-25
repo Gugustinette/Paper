@@ -16,7 +16,8 @@ public class Movie implements Parcelable {
         this.id = id;
         this.name = name;
         this.releaseData = releaseData;
-        this.posterPath = posterPath;
+        //this.posterPath = posterPath;
+        this.setPosterPath(posterPath);
         this.adult = adult;
         this.overview = overview;
         this.grade = grade;
@@ -52,7 +53,7 @@ public class Movie implements Parcelable {
     }
 
     public void setPosterPath(String posterPath) {
-        this.posterPath = posterPath;
+        this.posterPath = "https://image.tmdb.org/t/p/w300_and_h450_bestv2/" + posterPath;
     }
 
     public Boolean getAdult() {

@@ -49,7 +49,7 @@ public class MovieCardListAdapter extends RecyclerView.Adapter<MovieCardListAdap
         // Populate the data into the template view using the data object
         Uri imagePath = Uri.parse(movie.getPosterPath());
         Picasso.get()
-                .load("https://image.tmdb.org//t/p/w300_and_h450_bestv2/"+imagePath)
+                .load(imagePath)
                 .into(moviePoster, new Callback() {
                     @Override
                     public void onSuccess() {

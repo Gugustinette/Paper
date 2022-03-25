@@ -30,6 +30,7 @@
             android:background="@drawable/custom_linear_gradient_black"
             android:gravity="center_horizontal|center_vertical"
             android:orientation="vertical"
+            android:padding="30dp"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <TextView

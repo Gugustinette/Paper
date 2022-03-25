@@ -1,5 +1,6 @@
 package com.example.paper.ui.home;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,14 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +22,7 @@ import com.example.paper.R;
 import com.example.paper.databinding.FragmentHomeBinding;
 import com.example.paper.model.movie.Movie;
 import com.example.paper.model.movie.MovieCardListAdapter;
+import com.example.paper.ui.movie_page.MoviePageActivity;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
@@ -32,7 +31,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.Random;
 
 public class HomeFragment extends Fragment {
 
@@ -136,7 +135,8 @@ public class HomeFragment extends Fragment {
                         } else {
                             Log.i("MainActivity", "Success: " + result.toString());
                             JsonArray results = result.getAsJsonArray("results");
-                            JsonObject movie = results.get(10).getAsJsonObject();
+
+                            JsonObject movie = results.get(0).getAsJsonObject();
                             popular_movie = new Movie(
                                     movie.get("id").getAsString(),
                                     movie.get("title").getAsString(),
@@ -160,7 +160,7 @@ public class HomeFragment extends Fragment {
 
                             Uri imagePath = Uri.parse(popular_movie.getPosterPath());
                             Picasso.get()
-                                    .load("https://image.tmdb.org/t/p/w300_and_h450_bestv2/" + imagePath)
+                                    .load(imagePath)
                                     .into(v_popular_poster, new Callback() {
                                         @Override
                                         public void onSuccess() {
@@ -174,6 +174,14 @@ public class HomeFragment extends Fragment {
 
                             v_popular_title.setText(popular_movie.getName());
                             v_popular_overview.setText(popular_movie.getOverview());
+                            v_popular_button.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent movieIntent = new Intent(v.getContext(), MoviePageActivity.class);
+                                    movieIntent.putExtra("movie", popular_movie);
+                                    startActivity(movieIntent);
+                                }
+                            });
                         }
                     }
                 });
