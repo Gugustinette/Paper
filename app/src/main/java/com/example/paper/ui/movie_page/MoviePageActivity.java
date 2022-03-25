@@ -97,7 +97,6 @@ public class MoviePageActivity extends AppCompatActivity {
 
                             // For flatrate providers
                             try {
-
                             JsonArray french_flatrate_providers = french_providers.getAsJsonArray("flatrate");
 
                                 providers.append("\nEn streaming sur : ");
@@ -109,41 +108,37 @@ public class MoviePageActivity extends AppCompatActivity {
 
                             } catch (Exception exception) {
                                 //exception.printStackTrace();
-                                providers.append("\nPas encore en streaming");
                             }
 
                             // For buyer providers
                             try {
-
-                            JsonArray french_flatrate_providers = french_providers.getAsJsonArray("buy");
+                            JsonArray french_buyer_providers = french_providers.getAsJsonArray("buy");
 
                                 providers.append("\nEn vente sur : ");
-                                for (int i = 0; i < french_flatrate_providers.size(); i++) {
-                                    JsonObject curr_provider = french_flatrate_providers.get(i).getAsJsonObject();
+                                for (int i = 0; i < french_buyer_providers.size(); i++) {
+                                    JsonObject curr_provider = french_buyer_providers.get(i).getAsJsonObject();
                                     providers.append(curr_provider.get("provider_name").getAsString() + " ");
                                 }
 
 
                             } catch (Exception exception) {
                                 //exception.printStackTrace();
-                                providers.append("\nPas encore en vente");
                             }
 
                             // For VOD providers
                             try {
 
-                            JsonArray french_flatrate_providers = french_providers.getAsJsonArray("rent");
+                            JsonArray french_rent_providers = french_providers.getAsJsonArray("rent");
 
                                 providers.append("\nEn VOD sur : ");
-                                for (int i = 0; i < french_flatrate_providers.size(); i++) {
-                                    JsonObject curr_provider = french_flatrate_providers.get(i).getAsJsonObject();
+                                for (int i = 0; i < french_rent_providers.size(); i++) {
+                                    JsonObject curr_provider = french_rent_providers.get(i).getAsJsonObject();
                                     providers.append(curr_provider.get("provider_name").getAsString() + " ");
                                 }
 
 
                             } catch (Exception exception) {
                                 //exception.printStackTrace();
-                                providers.append("\nPas encore en VOD");
                             }
 
 
