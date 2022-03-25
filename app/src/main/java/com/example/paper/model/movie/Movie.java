@@ -88,6 +88,7 @@ public class Movie implements Parcelable {
                 ", posterPath='" + posterPath + '\'' +
                 ", adult=" + adult +
                 ", overview='" + overview + '\'' +
+                ", grade='" + grade + '\'' +
                 '}';
     }
 

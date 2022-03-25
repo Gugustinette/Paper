@@ -100,7 +100,7 @@ public class MovieCardListAdapter  extends ArrayAdapter<Movie> {
         // Populate the data into the template view using the data object
         Uri imagePath = Uri.parse(movie.getPosterPath());
         Picasso.get()
-                .load("https://image.tmdb.org//t/p/w300_and_h450_bestv2/"+imagePath)
+                .load("https://image.tmdb.org/t/p/w300_and_h450_bestv2/"+imagePath)
                 .into(movie_poster, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -108,7 +108,7 @@ public class MovieCardListAdapter  extends ArrayAdapter<Movie> {
 
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(getContext(), "Image introuvable", Toast.LENGTH_SHORT).show();;
+                        Toast.makeText(getContext(), "Image introuvable", Toast.LENGTH_SHORT).show();
                     }
                 });
         movie_title.setText(movie.getName());
