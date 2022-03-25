@@ -10,14 +10,16 @@ public class Movie implements Parcelable {
     private String posterPath;
     private Boolean adult;
     private String overview;
+    private String grade;
 
-    public Movie(String id, String name, String releaseData, String posterPath, Boolean adult, String overview) {
+    public Movie(String id, String name, String releaseData, String posterPath, Boolean adult, String overview, String grade) {
         this.id = id;
         this.name = name;
         this.releaseData = releaseData;
         this.posterPath = posterPath;
         this.adult = adult;
         this.overview = overview;
+        this.grade = grade;
     }
 
     // all getters and setters
@@ -67,6 +69,14 @@ public class Movie implements Parcelable {
 
     public void setOverview(String overview) {
         this.overview = overview;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
     }
 
     @Override

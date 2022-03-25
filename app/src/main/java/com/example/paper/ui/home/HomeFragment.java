@@ -44,15 +44,12 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        /*final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        */
+        // Popular movie
+        //
 
+
+        // Movies list
+        //
         // Data setup
         movies = new ArrayList<>();
 
@@ -91,7 +88,8 @@ public class HomeFragment extends Fragment {
                                         movie.get("release_date").getAsString(),
                                         movie.get("poster_path").getAsString(),
                                         movie.get("adult").getAsBoolean(),
-                                        movie.get("overview").getAsString()
+                                        movie.get("overview").getAsString(),
+                                        movie.get("vote_average").toString()
                                 ));
                             }
                             // Print the films
@@ -103,7 +101,41 @@ public class HomeFragment extends Fragment {
                         }
                     }
                 });
-    }
+        }
+
+    public Movie LaunchGetPopularMovies(Fragment context) {
+        String API_KEY = "8b466a6b5e68647ae3e550470e2bb324"; // getResources().getString(R.string.api_key);
+
+        // Get the data from the server with Ion
+        Ion.with(context)
+                .load("https://api.themoviedb.org/3/movie/popular?api_key=" + API_KEY)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            Log.e("MainActivity", "Error: " + e.getMessage());
+                        } else {
+                            Log.i("MainActivity", "Success: " + result.toString());
+                            JsonArray results = result.getAsJsonArray("results");
+                            JsonObject movie = results.get(0).getAsJsonObject();
+                            Movie temp_movie = new Movie(
+                                    movie.get("id").getAsString(),
+                                    movie.get("title").getAsString(),
+                                    movie.get("release_date").getAsString(),
+                                    movie.get("poster_path").getAsString(),
+                                    movie.get("adult").getAsBoolean(),
+                                    movie.get("overview").getAsString(),
+                                    movie.get("vote_average").toString()
+                            );
+                            // Print the films
+                            Log.i("MainActivity - Popular Movie", temp_movie.toString());
+
+                            return temp_movie;
+                        }
+                    }
+                });
+        }
 
     @Override
     public void onDestroyView() {

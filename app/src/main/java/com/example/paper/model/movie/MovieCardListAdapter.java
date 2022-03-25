@@ -8,13 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
+import android.widget.Toast;
 
 import com.example.paper.R;
-import com.example.paper.model.movie.Movie;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
-import java.net.URI;
 import java.util.ArrayList;
 
 public class MovieCardListAdapter  extends ArrayAdapter<Movie> {
@@ -40,9 +39,20 @@ public class MovieCardListAdapter  extends ArrayAdapter<Movie> {
 
         // Populate the data into the template view using the data object
         Uri imagePath = Uri.parse(movie.getPosterPath());
-        movie_poster.setImageURI(imagePath);
+        Picasso.get()
+                .load("https://image.tmdb.org//t/p/w300_and_h450_bestv2/"+imagePath)
+                .into(movie_poster, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Toast.makeText(getContext(), "Image introuvable", Toast.LENGTH_SHORT).show();;
+                    }
+                });
         movie_title.setText(movie.getName());
-        movie_grade.setText(movie.getName());
+        movie_grade.setText(movie.getGrade() + "/10");
 
         // Return the completed view to render on screen
         return movieView;
