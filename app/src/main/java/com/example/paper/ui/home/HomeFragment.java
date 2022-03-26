@@ -195,13 +195,10 @@ public class HomeFragment extends Fragment {
 
                             v_popular_title.setText(popular_movie.getName());
                             v_popular_overview.setText(popular_movie.getOverview());
-                            v_popular_button.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Intent movieIntent = new Intent(v.getContext(), MoviePageActivity.class);
-                                    movieIntent.putExtra("movie", popular_movie);
-                                    startActivity(movieIntent);
-                                }
+                            v_popular_button.setOnClickListener(v -> {
+                                Intent movieIntent = new Intent(v.getContext(), MoviePageActivity.class);
+                                movieIntent.putExtra("movie", popular_movie);
+                                startActivity(movieIntent);
                             });
                         }
                     }

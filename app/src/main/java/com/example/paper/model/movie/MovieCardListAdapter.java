@@ -1,6 +1,7 @@
 package com.example.paper.model.movie;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.Image;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.paper.R;
+import com.example.paper.ui.movie_page.MoviePageActivity;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -60,6 +62,13 @@ public class MovieCardListAdapter extends RecyclerView.Adapter<MovieCardListAdap
                         Toast.makeText(moviePoster.getContext(), "Image introuvable", Toast.LENGTH_SHORT).show();;
                     }
                 });
+
+        moviePoster.setOnClickListener(vClick -> {
+            Context context = vClick.getContext();
+            Intent movieIntent = new Intent(context, MoviePageActivity.class);
+            movieIntent.putExtra("movie", movie);
+            context.startActivity(movieIntent);
+        });
     }
 
     @Override
@@ -71,6 +80,7 @@ public class MovieCardListAdapter extends RecyclerView.Adapter<MovieCardListAdap
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_card_item,parent, false);
+
         return new MyViewHolder(v);
     }
 }
