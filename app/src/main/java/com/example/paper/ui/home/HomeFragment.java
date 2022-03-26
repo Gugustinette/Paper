@@ -18,7 +18,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.paper.R;
 import com.example.paper.databinding.FragmentHomeBinding;
 import com.example.paper.model.movie.Movie;
 import com.example.paper.model.movie.MovieCardListAdapter;
@@ -31,24 +30,31 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
     private FragmentHomeBinding binding;
 
+    // API KEY
     String API_KEY = "8b466a6b5e68647ae3e550470e2bb324";
 
+    // More Popular Movie
     Movie popular_movie;
     ImageView v_popular_poster;
     TextView v_popular_title;
     TextView v_popular_overview;
     Button v_popular_button;
 
-    private ArrayList<Movie> movies;
-    private MovieCardListAdapter moviesAdapter;
-    RecyclerView moviesView;
+    // Last Movies
+    private ArrayList<Movie> lastMovies;
+    private MovieCardListAdapter lastMoviesAdapter;
+    RecyclerView lastMoviesView;
+
+    // Best Movies
+    private ArrayList<Movie> bestMovies;
+    private MovieCardListAdapter bestMoviesAdapter;
+    RecyclerView bestMoviesView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -60,8 +66,10 @@ public class HomeFragment extends Fragment {
 
         // Select components
         //
-        // Movies Recycler View
-        moviesView = (RecyclerView) binding.MovieCardList;
+        // Last Movies Recycler View
+        lastMoviesView = (RecyclerView) binding.LastMoviesList;
+        // Best Movies Recycler View
+        bestMoviesView = (RecyclerView) binding.BestMoviesList;
         // Popular Movie
         v_popular_poster = binding.popularPoster;
         v_popular_title = binding.popularTitle;
@@ -71,25 +79,36 @@ public class HomeFragment extends Fragment {
         // Data
         //
         // Setup
-        movies = new ArrayList<>();
+        lastMovies = new ArrayList<>();
+        bestMovies = new ArrayList<>();
 
         // Data
         //
         // Display Setup
-        // Movies View
-        moviesView.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(this.getContext());
-        llm.setOrientation(LinearLayoutManager.HORIZONTAL);
-        moviesView.setLayoutManager(llm);
+        // Last Movies View
+        lastMoviesView.setHasFixedSize(true);
+        LinearLayoutManager llmLASTMOVIES = new LinearLayoutManager(this.getContext());
+        llmLASTMOVIES.setOrientation(LinearLayoutManager.HORIZONTAL);
+        lastMoviesView.setLayoutManager(llmLASTMOVIES);
         // Create the adapter to convert the array to views
-        moviesAdapter = new MovieCardListAdapter(movies);
-        moviesView.setAdapter(moviesAdapter);
+        lastMoviesAdapter = new MovieCardListAdapter(lastMovies);
+        lastMoviesView.setAdapter(lastMoviesAdapter);
+
+        // Best Movies View
+        bestMoviesView.setHasFixedSize(true);
+        LinearLayoutManager llmBESTMOVIES = new LinearLayoutManager(this.getContext());
+        llmBESTMOVIES.setOrientation(LinearLayoutManager.HORIZONTAL);
+        bestMoviesView.setLayoutManager(llmBESTMOVIES);
+        // Create the adapter to convert the array to views
+        bestMoviesAdapter = new MovieCardListAdapter(bestMovies);
+        bestMoviesView.setAdapter(bestMoviesAdapter);
 
         // Data
         //
         // Call
         this.LaunchGetMovies(this);
         this.LaunchGetPopularMovie(this);
+        this.LaunchGetBestMovies(this);
 
         return root;
     }
@@ -109,7 +128,7 @@ public class HomeFragment extends Fragment {
                             JsonArray results = result.getAsJsonArray("results");
                             for (int i = 0; i < results.size(); i++) {
                                 JsonObject movie = results.get(i).getAsJsonObject();
-                                movies.add(new Movie(
+                                lastMovies.add(new Movie(
                                         movie.get("id").getAsString(),
                                         movie.get("title").getAsString(),
                                         movie.get("release_date").getAsString(),
@@ -120,11 +139,11 @@ public class HomeFragment extends Fragment {
                                 ));
                             }
                             // Print the films
-                            for (Movie movie : movies) {
+                            for (Movie movie : lastMovies) {
                                 Log.i("MainActivity", movie.toString());
                             }
 
-                            moviesAdapter.notifyDataSetChanged();
+                            lastMoviesAdapter.notifyDataSetChanged();
                         }
                     }
                 });
@@ -188,6 +207,42 @@ public class HomeFragment extends Fragment {
                     }
                 });
         }
+
+    public void LaunchGetBestMovies(Fragment context) {
+        // Get the data from the server with Ion
+        Ion.with(context)
+                .load("https://api.themoviedb.org/3/discover/movie?api_key=" + API_KEY + "&vote_average.gte=8")
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            Log.e("MainActivity", "Error: " + e.getMessage());
+                        } else {
+                            Log.i("MainActivity", "Success: " + result.toString());
+                            JsonArray results = result.getAsJsonArray("results");
+                            for (int i = 0; i < results.size(); i++) {
+                                JsonObject movie = results.get(i).getAsJsonObject();
+                                bestMovies.add(new Movie(
+                                        movie.get("id").getAsString(),
+                                        movie.get("title").getAsString(),
+                                        movie.get("release_date").getAsString(),
+                                        movie.get("poster_path").getAsString(),
+                                        movie.get("adult").getAsBoolean(),
+                                        movie.get("overview").getAsString(),
+                                        movie.get("vote_average").getAsString()
+                                ));
+                            }
+                            // Print the films
+                            for (Movie movie : bestMovies) {
+                                Log.i("MainActivity", movie.toString());
+                            }
+
+                            bestMoviesAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+    }
 
 
     @Override
