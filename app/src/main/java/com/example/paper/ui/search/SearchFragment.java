@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +25,10 @@ import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class SearchFragment extends Fragment {
@@ -37,6 +41,10 @@ public class SearchFragment extends Fragment {
 
     // Search Elements
     EditText searchInput;
+    EditText searchInputDate;
+
+    String searchTerm;
+    String searchDate;
 
     // Searched Movies
     private ArrayList<Movie> searchedMovies;
@@ -56,6 +64,7 @@ public class SearchFragment extends Fragment {
         //
         // Search elements
         searchInput = (EditText) binding.searchInput;
+        searchInputDate = (EditText) binding.searchDate;
         // Searched Movies Recycler View
         searchedMoviesView = (RecyclerView) binding.SearchedMoviesList;
 
@@ -63,6 +72,8 @@ public class SearchFragment extends Fragment {
         //
         // Setup
         searchedMovies = new ArrayList<>();
+        searchTerm = "";
+        searchDate = "";
 
         // Data
         //
@@ -81,50 +92,74 @@ public class SearchFragment extends Fragment {
         // When making research
         searchInput.setOnEditorActionListener((v, actionId, event) -> {
             // Get the input
-            String input = searchInput.getText().toString();
-            this.SearchForMovies(this, input);
+            searchTerm = searchInput.getText().toString();
+            this.SearchForMovies(this);
+            return false;
+        });
+
+        searchInputDate.setOnEditorActionListener((v, actionId, event) -> {
+            // Get the date
+            searchDate = searchInputDate.getText().toString();
+            this.SearchForMovies(this);
             return false;
         });
 
         return root;
     }
 
-    public void SearchForMovies(Fragment context, String searchTerm) {
+    public void SearchForMovies(Fragment context) {
+        String URL = "https://api.themoviedb.org/3/search/movie?api_key=" + API_KEY;
+        if (!searchTerm.equals("")) {
+            try {
+                URL += "&query=" + URLEncoder.encode(searchTerm, StandardCharsets.UTF_8.toString());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        if (!searchDate.equals("")) {
+            try {
+                URL += "&year=" + URLEncoder.encode(searchDate, StandardCharsets.UTF_8.toString());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.i("SearchActivity", URL);
         // Get the data from the server with Ion
         Ion.with(context)
-                .load("https://api.themoviedb.org/3/search/movie?api_key="
-                        + API_KEY
-                        + "&query="
-                        + URI.create(searchTerm)
-                )
+                .load(URL)
                 .asJsonObject()
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
-                            Log.e("MainActivity", "Error: " + e.getMessage());
+                            Log.e("SearchActivity", "Error: " + e.getMessage());
                         } else {
-                            Log.i("MainActivity", "Success: " + result.toString());
+                            // Log.i("SearchActivity", "Success: " + result.toString());
                             JsonArray results = result.getAsJsonArray("results");
-                            for (int i = 0; i < results.size(); i++) {
-                                JsonObject movie = results.get(i).getAsJsonObject();
-                                Log.i("MOVIE", movie.toString());
-                                searchedMovies.add(new Movie(
-                                        movie.get("id").getAsString(),
-                                        movie.get("title").getAsString(),
-                                        movie.get("release_date").getAsString(),
-                                        movie.get("poster_path").isJsonNull() ? "": movie.get("poster_path").getAsString(),
-                                        movie.get("adult").getAsBoolean(),
-                                        movie.get("overview").getAsString(),
-                                        movie.get("vote_average").getAsString()
-                                ));
+                            if (results == null || results.isJsonNull()) {
+                                // Toast
+                                Toast.makeText(getContext(), "Aucun résultat", Toast.LENGTH_SHORT).show();
                             }
-                            // Print the films
-                            for (Movie movie : searchedMovies) {
-                                Log.i("MainActivity", movie.toString());
-                            }
+                            else {
+                                for (int i = 0; i < results.size(); i++) {
+                                    JsonObject movie = results.get(i).getAsJsonObject();
+                                    searchedMovies.add(new Movie(
+                                            movie.get("id").getAsString(),
+                                            movie.get("title").getAsString(),
+                                            movie.get("release_date").getAsString(),
+                                            movie.get("poster_path").isJsonNull() ? "": movie.get("poster_path").getAsString(),
+                                            movie.get("adult").getAsBoolean(),
+                                            movie.get("overview").getAsString(),
+                                            movie.get("vote_average").getAsString()
+                                    ));
+                                }
+                                // Print the films
+                                for (Movie movie : searchedMovies) {
+                                    Log.i("SearchActivity", movie.toString());
+                                }
 
-                            searchedMoviesAdapter.notifyDataSetChanged();
+                                searchedMoviesAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                 });
