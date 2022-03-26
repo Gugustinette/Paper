@@ -38,6 +38,8 @@ public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
     private FragmentHomeBinding binding;
 
+    String API_KEY = "8b466a6b5e68647ae3e550470e2bb324";
+
     Movie popular_movie;
     ImageView v_popular_poster;
     TextView v_popular_title;
@@ -57,34 +59,42 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
 
         // Select components
-        // Attach the adapter to a ListView
+        //
+        // Movies Recycler View
         moviesView = (RecyclerView) binding.MovieCardList;
+        // Popular Movie
+        v_popular_poster = binding.popularPoster;
+        v_popular_title = binding.popularTitle;
+        v_popular_button = binding.popularDiscover;
+        v_popular_overview = binding.popularOverview;
 
-        // Popular movie
+        // Data
         //
-        // init
-        this.LaunchGetPopularMovie(this, container);
-
-        // Movies list
-        //
+        // Setup
         movies = new ArrayList<>();
-        this.LaunchGetMovies(this);
 
+        // Data
+        //
+        // Display Setup
+        // Movies View
         moviesView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this.getContext());
         llm.setOrientation(LinearLayoutManager.HORIZONTAL);
         moviesView.setLayoutManager(llm);
-
         // Create the adapter to convert the array to views
         moviesAdapter = new MovieCardListAdapter(movies);
         moviesView.setAdapter(moviesAdapter);
+
+        // Data
+        //
+        // Call
+        this.LaunchGetMovies(this);
+        this.LaunchGetPopularMovie(this);
 
         return root;
     }
 
     public void LaunchGetMovies(Fragment context) {
-        String API_KEY = "8b466a6b5e68647ae3e550470e2bb324"; // getResources().getString(R.string.api_key);
-
         // Get the data from the server with Ion
         Ion.with(context)
                 .load("https://api.themoviedb.org/3/discover/movie?api_key=" + API_KEY)
@@ -120,9 +130,7 @@ public class HomeFragment extends Fragment {
                 });
         }
 
-    public void LaunchGetPopularMovie(Fragment context, ViewGroup container) {
-        String API_KEY = "8b466a6b5e68647ae3e550470e2bb324"; // getResources().getString(R.string.api_key);
-
+    public void LaunchGetPopularMovie(Fragment context) {
         // Get the data from the server with Ion
         Ion.with(context)
                 .load("https://api.themoviedb.org/3/movie/popular?api_key=" + API_KEY)
@@ -149,12 +157,6 @@ public class HomeFragment extends Fragment {
 
                             // Print the films
                             Log.i("MainActivity - Popular Movie", popular_movie.toString());
-
-
-                            v_popular_poster = container.findViewById(R.id.popular_poster);
-                            v_popular_title = container.findViewById(R.id.popular_title);
-                            v_popular_button = container.findViewById(R.id.popular_discover);
-                            v_popular_overview = container.findViewById(R.id.popular_overview);
 
                             Log.d("Popular Movie", String.valueOf(popular_movie));
 
