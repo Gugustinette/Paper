@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -47,9 +48,11 @@ public class SearchFragment extends Fragment {
     // Search Elements
     EditText searchInput;
     EditText searchInputDate;
+    CheckBox displayAdultMoviesInput;
 
     String searchTerm;
     String searchDate;
+    Boolean displayAdultMovies;
 
     // Searched Movies
     private ArrayList<Movie> searchedMovies;
@@ -70,6 +73,7 @@ public class SearchFragment extends Fragment {
         // Search elements
         searchInput = (EditText) binding.searchInput;
         searchInputDate = (EditText) binding.searchDate;
+        displayAdultMoviesInput = (CheckBox) binding.adultMovieCheckBox;
         // Searched Movies Recycler View
         searchedMoviesView = (RecyclerView) binding.SearchedMoviesList;
 
@@ -79,6 +83,7 @@ public class SearchFragment extends Fragment {
         searchedMovies = new ArrayList<>();
         searchTerm = "";
         searchDate = "";
+        displayAdultMovies = false;
 
         // Data
         //
@@ -109,6 +114,11 @@ public class SearchFragment extends Fragment {
             return false;
         });
 
+        displayAdultMoviesInput.setOnCheckedChangeListener((v, isChecked) -> {
+            displayAdultMovies = isChecked;
+            this.SearchForMovies(this, container);
+        });
+
 
         return root;
     }
@@ -123,6 +133,9 @@ public class SearchFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+        else {
+            URL = "https://api.themoviedb.org/3/discover/movie?api_key=" + API_KEY;
+        }
 
         // Search with date
         if (!searchDate.equals("")) {
@@ -131,6 +144,14 @@ public class SearchFragment extends Fragment {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
+        }
+
+        // Include Adult Movies
+        if (displayAdultMovies) {
+            URL += "&include_adult=true";
+        }
+        else {
+            URL += "&include_adult=false";
         }
 
         Log.i("SearchActivity", URL);
@@ -144,6 +165,7 @@ public class SearchFragment extends Fragment {
                         if (e != null) {
                             Log.e("SearchActivity", "Error: " + e.getMessage());
                         } else {
+                            searchedMovies.clear();
                             // Log.i("SearchActivity", "Success: " + result.toString());
                             JsonArray results = result.getAsJsonArray("results");
                             if (results == null || results.isJsonNull()) {
@@ -168,9 +190,9 @@ public class SearchFragment extends Fragment {
                                 for (Movie movie : searchedMovies) {
                                     Log.i("SearchActivity", movie.toString());
                                 }
-
-                                searchedMoviesAdapter.notifyDataSetChanged();
                             }
+
+                            searchedMoviesAdapter.notifyDataSetChanged();
                         }
                 });
     }
