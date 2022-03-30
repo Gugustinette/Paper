@@ -34,6 +34,8 @@ public class MoviePageActivity extends AppCompatActivity {
     TextView v_adult;
     TextView v_critics;
 
+    ImageView returnArrow;
+
     // API KEY
     String API_KEY = "8b466a6b5e68647ae3e550470e2bb324";
 
@@ -55,6 +57,14 @@ public class MoviePageActivity extends AppCompatActivity {
         v_runtime = findViewById(R.id.runtime);
         v_overwiew = findViewById(R.id.overview);
         v_adult = findViewById(R.id.adult);
+
+        returnArrow = findViewById(R.id.returnArrow);
+
+        // Listeners
+        returnArrow.setOnClickListener((v) -> {
+            // Return
+            finish();
+        });
 
         // Try catch to handle when the pass is null
         Movie movie = (Movie) getIntent().getExtras().get("movie");
