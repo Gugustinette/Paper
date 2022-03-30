@@ -2,12 +2,13 @@ package com.example.paper.ui.movie_page;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.paper.R;
@@ -26,13 +27,15 @@ public class MoviePageActivity extends AppCompatActivity {
     ImageView v_poster;
     TextView v_title;
     TextView v_illustrations;
-    TextView v_duration;
+    TextView v_runtime;
     TextView v_overwiew;
     TextView v_release_date;
     TextView v_genres;
     TextView v_adult;
     TextView v_critics;
 
+    // API KEY
+    String API_KEY = "8b466a6b5e68647ae3e550470e2bb324";
 
     ArrayList<StremingProvider> providers;
 
@@ -42,10 +45,14 @@ public class MoviePageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_page);
 
+
+        // Hide action bar
+        getSupportActionBar().hide();
+
         // Init view components
         v_poster = findViewById(R.id.poster_image);
         v_title = findViewById(R.id.movie_title);
-        v_duration = findViewById(R.id.duration);
+        v_runtime = findViewById(R.id.runtime);
         v_overwiew = findViewById(R.id.overview);
         v_adult = findViewById(R.id.adult);
 
@@ -154,23 +161,42 @@ public class MoviePageActivity extends AppCompatActivity {
     public void SetMovieDetails(Context context, MoviePageActivity activity, String movie_id) {
         String API_KEY = "8b466a6b5e68647ae3e550470e2bb324"; // getResources().getString(R.string.api_key);
 
-        v_duration = activity.findViewById(R.id.duration);
+        v_runtime = activity.findViewById(R.id.runtime);
         v_genres = activity.findViewById(R.id.genres);
         v_release_date = activity.findViewById(R.id.releasedate);
 
         // Get the data from the server with Ion
         Ion.with(context)
-                .load("https://api.themoviedb.org/3/movie/"+ movie_id +"/" + API_KEY)
+                .load("https://api.themoviedb.org/3/movie/"+ movie_id +"?api_key=" + API_KEY)
                 .asJsonObject()
                 .setCallback(new FutureCallback<JsonObject>() {
+                    @RequiresApi(api = Build.VERSION_CODES.N)
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
                             Log.e("MainActivity", "Error: " + e.getMessage());
                         } else {
-                            Log.i("MainActivity", "Success: " + result.toString());
-                            //JsonObject results = result.getAsJsonObject("results");
-                            Log.d("results2", result.toString());
+                            // Runtime
+                            Integer runtime = result.get("runtime").getAsInt();
+                            Integer hours = runtime / 60;
+                            Integer minutes = runtime % 60;
+
+                            v_runtime.setText(hours+":"+minutes);
+
+
+                            JsonArray genres = result.getAsJsonArray("genres");
+
+                            genres.forEach((elmnt) -> {
+                                if (!v_genres.getText().equals("")) {
+                                    v_genres.setText(v_genres.getText() + ", " + elmnt.getAsJsonObject().get("name").toString());
+                                }else{
+                                    v_genres.setText(elmnt.getAsJsonObject().get("name").toString());
+                                }
+                            });
+
+                            String realese_date = result.get("release_date").getAsString();
+                            String[] date = realese_date.split("-");
+                            v_release_date.setText("Sortie le " + date[2] + "/" + date[1] + "/" + date[0]);
 
 
                         }

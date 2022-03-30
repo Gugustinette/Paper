@@ -56,6 +56,11 @@ public class HomeFragment extends Fragment {
     private MovieCardListAdapter bestMoviesAdapter;
     RecyclerView bestMoviesView;
 
+    // Best Movies
+    private ArrayList<Movie> actionsMovies;
+    private MovieCardListAdapter actionsMoviesAdapter;
+    RecyclerView actionsMoviesView;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         // Setup
@@ -70,6 +75,8 @@ public class HomeFragment extends Fragment {
         lastMoviesView = (RecyclerView) binding.LastMoviesList;
         // Best Movies Recycler View
         bestMoviesView = (RecyclerView) binding.BestMoviesList;
+        // Action Movies Recycler View
+        actionsMoviesView = (RecyclerView) binding.ActionsMoviesList;
         // Popular Movie
         v_popular_poster = binding.popularPoster;
         v_popular_title = binding.popularTitle;
@@ -81,6 +88,7 @@ public class HomeFragment extends Fragment {
         // Setup
         lastMovies = new ArrayList<>();
         bestMovies = new ArrayList<>();
+        actionsMovies = new ArrayList<>();
 
         // Data
         //
@@ -103,12 +111,22 @@ public class HomeFragment extends Fragment {
         bestMoviesAdapter = new MovieCardListAdapter(bestMovies);
         bestMoviesView.setAdapter(bestMoviesAdapter);
 
+        // Actions Movies View
+        actionsMoviesView.setHasFixedSize(true);
+        LinearLayoutManager llmACTIONSMOVIES = new LinearLayoutManager(this.getContext());
+        llmACTIONSMOVIES.setOrientation(LinearLayoutManager.HORIZONTAL);
+        actionsMoviesView.setLayoutManager(llmACTIONSMOVIES);
+        // Create the adapter to convert the array to views
+        actionsMoviesAdapter = new MovieCardListAdapter(actionsMovies);
+        actionsMoviesView.setAdapter(actionsMoviesAdapter);
+
         // Data
         //
         // Call
-        this.LaunchGetMovies(this);
         this.LaunchGetPopularMovie(this);
+        this.LaunchGetMovies(this);
         this.LaunchGetBestMovies(this);
+        this.LaunchGetActionsMovies(this);
 
         return root;
     }
@@ -232,6 +250,43 @@ public class HomeFragment extends Fragment {
                             }
                             // Print the films
                             for (Movie movie : bestMovies) {
+                                Log.i("MainActivity", movie.toString());
+                            }
+
+                            bestMoviesAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+        }
+
+
+    public void LaunchGetActionsMovies(Fragment context) {
+        // Get the data from the server with Ion
+        Ion.with(context)
+                .load("https://api.themoviedb.org/3/discover/movie?api_key=" + API_KEY + "&with_genres=28")
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            Log.e("MainActivity", "Error: " + e.getMessage());
+                        } else {
+                            Log.i("MainActivity ACTION", "Success: " + result.toString());
+                            JsonArray results = result.getAsJsonArray("results");
+                            for (int i = 0; i < results.size(); i++) {
+                                JsonObject movie = results.get(i).getAsJsonObject();
+                                actionsMovies.add(new Movie(
+                                        movie.get("id").getAsString(),
+                                        movie.get("title").getAsString(),
+                                        movie.get("release_date").getAsString(),
+                                        movie.get("poster_path").getAsString(),
+                                        movie.get("adult").getAsBoolean(),
+                                        movie.get("overview").getAsString(),
+                                        movie.get("vote_average").getAsString()
+                                ));
+                            }
+                            // Print the films
+                            for (Movie movie : actionsMovies) {
                                 Log.i("MainActivity", movie.toString());
                             }
 

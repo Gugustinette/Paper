@@ -59,6 +59,19 @@ public class MovieCardListAdapter extends RecyclerView.Adapter<MovieCardListAdap
 
                     @Override
                     public void onError(Exception e) {
+                        Picasso.get()
+                                .load("https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.cjoint.com%2Fc%2FJLFrj6Sanqu&psig=AOvVaw0dF-ypQZoYqV0NUqV4zrxR&ust=1648571623005000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCOiOiZCe6fYCFQAAAAAdAAAAABAI")
+                                .into(moviePoster, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+
+                                    }
+                                });
                         Toast.makeText(moviePoster.getContext(), "Image introuvable", Toast.LENGTH_SHORT).show();;
                     }
                 });

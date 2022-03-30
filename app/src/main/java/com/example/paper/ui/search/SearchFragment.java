@@ -5,7 +5,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,9 +17,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.paper.R;
 import com.example.paper.databinding.FragmentSearchBinding;
 import com.example.paper.model.movie.Movie;
 import com.example.paper.model.movie.MovieCardListAdapter;
@@ -80,8 +85,8 @@ public class SearchFragment extends Fragment {
         // Display Setup
         // Last Movies View
         searchedMoviesView.setHasFixedSize(true);
-        LinearLayoutManager llmSEARCHEDMOVIES = new LinearLayoutManager(this.getContext());
-        llmSEARCHEDMOVIES.setOrientation(LinearLayoutManager.VERTICAL);
+        GridLayoutManager llmSEARCHEDMOVIES = new GridLayoutManager(this.getContext(), 3);
+        //llmSEARCHEDMOVIES.setOrientation(LinearLayoutManager);
         searchedMoviesView.setLayoutManager(llmSEARCHEDMOVIES);
         // Create the adapter to convert the array to views
         searchedMoviesAdapter = new MovieCardListAdapter(searchedMovies);
@@ -93,22 +98,24 @@ public class SearchFragment extends Fragment {
         searchInput.setOnEditorActionListener((v, actionId, event) -> {
             // Get the input
             searchTerm = searchInput.getText().toString();
-            this.SearchForMovies(this);
+            this.SearchForMovies(this, container);
             return false;
         });
 
         searchInputDate.setOnEditorActionListener((v, actionId, event) -> {
             // Get the date
             searchDate = searchInputDate.getText().toString();
-            this.SearchForMovies(this);
+            this.SearchForMovies(this, container);
             return false;
         });
+
 
         return root;
     }
 
-    public void SearchForMovies(Fragment context) {
+    public void SearchForMovies(Fragment context, ViewGroup container) {
         String URL = "https://api.themoviedb.org/3/search/movie?api_key=" + API_KEY;
+        // Search with name
         if (!searchTerm.equals("")) {
             try {
                 URL += "&query=" + URLEncoder.encode(searchTerm, StandardCharsets.UTF_8.toString());
@@ -116,6 +123,8 @@ public class SearchFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+
+        // Search with date
         if (!searchDate.equals("")) {
             try {
                 URL += "&year=" + URLEncoder.encode(searchDate, StandardCharsets.UTF_8.toString());
@@ -123,6 +132,7 @@ public class SearchFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+
         Log.i("SearchActivity", URL);
         // Get the data from the server with Ion
         Ion.with(context)
@@ -143,15 +153,16 @@ public class SearchFragment extends Fragment {
                             else {
                                 for (int i = 0; i < results.size(); i++) {
                                     JsonObject movie = results.get(i).getAsJsonObject();
-                                    searchedMovies.add(new Movie(
-                                            movie.get("id").getAsString(),
-                                            movie.get("title").getAsString(),
-                                            movie.get("release_date").getAsString(),
-                                            movie.get("poster_path").isJsonNull() ? "": movie.get("poster_path").getAsString(),
-                                            movie.get("adult").getAsBoolean(),
-                                            movie.get("overview").getAsString(),
-                                            movie.get("vote_average").getAsString()
-                                    ));
+                                        searchedMovies.add(new Movie(
+                                                movie.get("id").getAsString(),
+                                                movie.get("title").getAsString(),
+                                                movie.get("release_date").getAsString(),
+                                                movie.get("poster_path").isJsonNull() ? "": movie.get("poster_path").getAsString(),
+                                                movie.get("adult").getAsBoolean(),
+                                                movie.get("overview").getAsString(),
+                                                movie.get("vote_average").getAsString()
+                                        ));
+                                    }
                                 }
                                 // Print the films
                                 for (Movie movie : searchedMovies) {
@@ -161,10 +172,8 @@ public class SearchFragment extends Fragment {
                                 searchedMoviesAdapter.notifyDataSetChanged();
                             }
                         }
-                    }
                 });
     }
-
 
     @Override
     public void onDestroyView() {
